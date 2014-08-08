@@ -25,6 +25,8 @@ def mkdir(dirname):
         os.makedirs(dirname)
 
 def matrix_plot(data, figname='fig', figfmt='png', figsize=(8, 6), log=False):
+    # mask nan or other invalid values
+    data = np.ma.masked_invalid(data, copy=False)
     plt.figure(figsize=figsize)
     if log:
         # plt.pcolor(np.log10(np.abs(data)))
@@ -38,6 +40,8 @@ def matrix_plot(data, figname='fig', figfmt='png', figsize=(8, 6), log=False):
     plt.savefig(figname + '.' + figfmt)
 
 def wf_plot(data, figname='wf', figfmt='png', figsize=(13, 5)):
+    # mask nan or other invalid values
+    data = np.ma.masked_invalid(data, copy=False)
     plt.figure(figsize=(8, 6))
     for row in range(data.shape[0]):
         plt.plot(data[row, :])
@@ -83,6 +87,8 @@ def ps_1d_plot(band_k_center, band_power, k_center, powerspectrum, error, line_t
 
 def ps_2d_plot(kperp_bands, kpar_bands, powerspectrum, figname='ps2d', figfmt='png', figsize=(8, 6), log=False, vmin=None, vmax=None):
     ps2d = powerspectrum.reshape(kperp_bands.shape[0] - 1, kpar_bands.shape[0] - 1).T
+    # mask nan or other invalid values
+    ps2d = np.ma.masked_invalid(ps2d, copy=False)
     vmin = vmin if vmin is not None else np.min(ps2d)
     vmax = vmax if vmax is not None else np.max(ps2d)
     plt.figure(figsize=figsize)

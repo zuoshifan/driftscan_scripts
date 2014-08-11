@@ -42,7 +42,7 @@ def visualize_cyl_beam(args):
             cyl_width = ('%s'%args.cyl_width).replace('.', '_')
             out_file = 'pol_cyl_beam_resp_%s__%s.%s'%(freq, cyl_width, args.figfmt)
         # Plot and save image
-        fig = plt.figure(1, figsize=(args.figlength, 2*args.figwidth))
+        fig1 = plt.figure(1, figsize=(args.figlength, 2*args.figwidth))
         title11 = 'X feed theta direction, f = %s MHz, w = %s m'%(args.freq, args.cyl_width)
         title12 = 'X feed phi direction, f = %s MHz, w = %s m'%(args.freq, args.cyl_width)
         healpy.mollview(beamx_resp[:, 0], fig=1, sub=221, title=title11, min=args.min, max=args.max)
@@ -53,30 +53,59 @@ def visualize_cyl_beam(args):
         healpy.mollview(beamy_resp[:, 1], fig=1, sub=224, title=title22, min=args.min, max=args.max)
         if args.grid:
             healpy.graticule()
-        fig.savefig(out_file)
-        fig.clf()
+        fig1.savefig(out_file)
+        fig1.clf()
 
-        # Plot the total I response
+        # R_{I to I}
         II_resp = (beamx_resp[:, 0]**2 + beamx_resp[:, 1]**2 + beamy_resp[:, 0]**2 + beamy_resp[:, 1]**2) / 2.0
-        fig1 = plt.figure(2, figsize=(args.figlength, args.figwidth))
+        # R_{P to I}
+        PI_resp = (beamx_resp[:, 0]**2 - beamx_resp[:, 1]**2 + beamx_resp[:, 0]*beamx_resp[:, 1] + beamy_resp[:, 0]**2 - beamy_resp[:, 1]**2 + beamy_resp[:, 0]*beamy_resp[:, 1]) / 2.0
+
+        # Plot the R_{I to I}response
+        fig2 = plt.figure(2, figsize=(args.figlength, args.figwidth))
         healpy.mollview(II_resp, fig=2, min=args.min, max=args.max)
         if args.grid:
             healpy.graticule()
-        fig1.savefig('II_mollview' + out_file)
-        fig1.clf()
+        fig2.savefig('II_mollview' + out_file)
+        fig2.clf()
+
+        # Plot the R_{P to I}response
+        fig3 = plt.figure(3, figsize=(args.figlength, args.figwidth))
+        healpy.mollview(PI_resp, fig=3, min=args.min, max=args.max)
+        if args.grid:
+            healpy.graticule()
+        fig3.savefig('PI_mollview' + out_file)
+        fig3.clf()
+
 
         # cart_array = healpy.cartview(II_resp, fig=3, lonra=[-10, 10], min=args.min, max=args.max, aspect=0.25, notext=True, hold=True, title='', return_projected_map=True)
         lon_range = [-10, 10]
-        II_cart = healpy.cartview(II_resp, lonra=lon_range, return_projected_map=True)
         ext = (-10, 10, -90, 90)
+        # R_{I to I } cartesian
+        II_cart = healpy.cartview(II_resp, lonra=lon_range, return_projected_map=True)
+        ticks = np.linspace(np.min(II_cart), np.max(II_cart), 6)
+        ticks = np.around(ticks, decimals=1)
         plt.figure(figsize=(4, 5))
-        plt.imshow(II_cart, extent=ext, aspect=0.2, origin='lower')
+        plt.imshow(II_cart, extent=ext, aspect=0.2, origin='lower', vmin=ticks[0], vmax=ticks[-1])
         ax = plt.gca()
         ax.yaxis.set_major_locator(MultipleLocator(30))
         plt.xlabel('EW / deg')
         plt.ylabel('NS / deg')
-        plt.colorbar(shrink=0.6 ,orientation='horizontal', ticks=[0.0, 0.2, 0.4, 0.6, 0.8,1.0])
+        plt.colorbar(shrink=0.6 ,orientation='horizontal', ticks=ticks)
         plt.savefig('II_cartview_' + out_file)
+        # R_{P to I } cartesian
+        PI_cart = healpy.cartview(PI_resp, lonra=lon_range, return_projected_map=True)
+        ticks = np.linspace(np.min(PI_cart), np.max(PI_cart), 4)
+        ticks = np.around(ticks, decimals=2)
+        plt.figure(figsize=(4, 5))
+        plt.imshow(PI_cart, extent=ext, aspect=0.2, origin='lower', vmin=ticks[0], vmax=ticks[-1])
+        ax = plt.gca()
+        ax.yaxis.set_major_locator(MultipleLocator(30))
+        plt.xlabel('EW / deg')
+        plt.ylabel('NS / deg')
+        plt.colorbar(shrink=0.6 ,orientation='horizontal', ticks=ticks)
+        plt.savefig('PI_cartview_' + out_file)
+
     else:
         unpol_cyl = cyl.UnpolarisedCylinderTelescope(args.lat, args.lon)
         unpol_cyl.cylinder_width = args.cyl_width

@@ -6,7 +6,7 @@
 :Date: 2014-04-02
 :email: sfzuo@bao.ac.cn
 :usage:
-    python view_map.py [-h] [-o [OUTFILE]] [-i IFREQ] [-p {0,1,2,3}] [--min MIN] [--max MAX] [-l FIGLENGTH] [-w FIGWIDTH] [-g] mapfiles [mapfiles ...]
+    python view_map.py [-h] [-o [OUTFILE]] [-f FORMAT] [-i IFREQ] [-p {0,1,2,3}] [--min MIN] [--max MAX] [-l FIGLENGTH] [-w FIGWIDTH] [-g] mapfiles [mapfiles ...]
 """
 
 import argparse
@@ -14,7 +14,7 @@ import argparse
 
 def visualize_map(args):
     """Visualize sky maps in hdf5 files.
-    
+
     Arguments
     ---------
     args : argparse namespace.
@@ -34,7 +34,7 @@ def visualize_map(args):
                 hpmap = f['map'][:]
             else:
                 hpmap += f['map'][:]
-                
+
     # Check args validity
     if args.ifreq < -(hpmap.shape)[0] or args.ifreq >= (hpmap.shape)[0]:
         raise Exception('Invalid frequency channel %d, should be in range(-%d, %d).'%(args.ifreq, (hpmap.shape)[0], (hpmap.shape)[0]))
@@ -51,7 +51,7 @@ def visualize_map(args):
     if args.outfile:
         out_file = args.outfile
     else:
-        out_file = ((args.mapfiles[0].split('/')[-1]).split('.')[0] + '_' + str(ifreq) + '_{' + str(args.pol) + '}' +  '.png').format('T', 'Q', 'U', 'V')
+        out_file = ((args.mapfiles[0].split('/')[-1]).split('.')[0] + '_' + str(ifreq) + '_{' + str(args.pol) + '}' +  '.' + args.format).format('T', 'Q', 'U', 'V')
 
     # Plot and save image
     fig = plt.figure(1, figsize=(args.figlength,args.figwidth))
@@ -65,7 +65,8 @@ def visualize_map(args):
 
 parser = argparse.ArgumentParser(description='Visualize a sky map in hdf5 files.')
 parser.add_argument('mapfiles', type=str, nargs='+', help='Input hdf5 sky map files to visualize. If more than one, they will be first combined, i.e. added together.')
-parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file (png/eps) to save into. If not present, the output image file name will be auto created from the first input map file name and input args (png).')
+parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file to save into. If not present, the output image file name will be auto created from the first input map file name and input args.')
+parser.add_argument('-f', '--format', default='pdf', help='Output image format.')
 parser.add_argument('-i', '--ifreq', type=int, default=0, help='Frequency channel to visualize (start from 0). Negative integer N means the last Nth channel.')
 parser.add_argument('-p', '--pol', type=int, default=0, choices=range(4), help='Polarization component to visualize, 0 for I/T, 1 for Q, 2 for U, 3 for V.')
 parser.add_argument('--min', type=float, help='The min value of the visualize range in the output image.')

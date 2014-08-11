@@ -23,6 +23,7 @@ def visualize_cyl_beam(args):
     import matplotlib
     matplotlib.use('Agg')
     from matplotlib import pyplot as plt
+    from matplotlib.ticker import MultipleLocator
 
     if args.pol:
         pol_cyl = cyl.PolarisedCylinderTelescope(args.lat, args.lon)
@@ -39,7 +40,7 @@ def visualize_cyl_beam(args):
         else:
             freq = ('%s'%args.freq).replace('.', '_')
             cyl_width = ('%s'%args.cyl_width).replace('.', '_')
-            out_file = 'pol_cyl_beam_resp_%s__%s.png'%(freq, cyl_width)
+            out_file = 'pol_cyl_beam_resp_%s__%s.%s'%(freq, cyl_width, args.figfmt)
         # Plot and save image
         fig = plt.figure(1, figsize=(args.figlength, 2*args.figwidth))
         title11 = 'X feed theta direction, f = %s MHz, w = %s m'%(args.freq, args.cyl_width)
@@ -64,12 +65,18 @@ def visualize_cyl_beam(args):
         fig1.savefig('II_mollview' + out_file)
         fig1.clf()
 
-        fig2 = plt.figure(3, figsize=(args.figlength, args.figwidth))
-        healpy.cartview(II_resp, fig=3, lonra=[-10, 10], min=args.min, max=args.max, aspect=0.25, notext=True, hold=True, title='')
-        if args.grid:
-            healpy.graticule()
-        fig2.savefig('II_cartview_' + out_file)
-        fig2.clf()
+        # cart_array = healpy.cartview(II_resp, fig=3, lonra=[-10, 10], min=args.min, max=args.max, aspect=0.25, notext=True, hold=True, title='', return_projected_map=True)
+        lon_range = [-10, 10]
+        II_cart = healpy.cartview(II_resp, lonra=lon_range, return_projected_map=True)
+        ext = (-10, 10, -90, 90)
+        plt.figure(figsize=(4, 5))
+        plt.imshow(II_cart, extent=ext, aspect=0.2, origin='lower')
+        ax = plt.gca()
+        ax.yaxis.set_major_locator(MultipleLocator(30))
+        plt.xlabel('EW / deg')
+        plt.ylabel('NS / deg')
+        plt.colorbar(shrink=0.6 ,orientation='horizontal', ticks=[0.0, 0.2, 0.4, 0.6, 0.8,1.0])
+        plt.savefig('II_cartview_' + out_file)
     else:
         unpol_cyl = cyl.UnpolarisedCylinderTelescope(args.lat, args.lon)
         unpol_cyl.cylinder_width = args.cyl_width
@@ -82,7 +89,7 @@ def visualize_cyl_beam(args):
         else:
             freq = ('%s'%args.freq).replace('.', '_')
             cyl_width = ('%s'%args.cyl_width).replace('.', '_')
-            out_file = 'unpol_cyl_beam_resp_%s__%s.png'%(freq, cyl_width)
+            out_file = 'unpol_cyl_beam_resp_%s__%s.%s'%(freq, cyl_width, args.figfmt)
         # Plot and save image
         fig = plt.figure(1, figsize=(args.figlength, args.figwidth))
         title = 'Beam pattern, f = %s MHz, w = %s m'%(args.freq, args.cyl_width)
@@ -95,7 +102,8 @@ def visualize_cyl_beam(args):
 
 
 parser = argparse.ArgumentParser(description='Visualize cylinder telescope beam response.')
-parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file (png/eps) to save into. If not present, the output image file name will be auto created from the input args (png).')
+parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file to save into. If not present, the output image file name will be auto created from the input args.')
+parser.add_argument('--figfmt', default='pdf', help='Output image format.')
 parser.add_argument('--lat', type=float, nargs='?', default=45, help='Telescope latitude.')
 parser.add_argument('--lon', type=float, nargs='?', default=0, help='Telescope longitude.')
 parser.add_argument('-f', '--freq', type=float, nargs='?', default=700.0, help='Telescope observing frequency.')

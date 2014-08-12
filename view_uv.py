@@ -6,7 +6,7 @@
 :Date: 2014-08-01
 :email: sfzuo@bao.ac.cn
 :usage:
-    python view_uv.py [-h] [-i IFREQ] [-a] [-c] [-o [OUTFILE]] [-l FIGLENGTH] [-w FIGWIDTH] [-g] [infile]
+    python view_uv.py [-h] [-i IFREQ] [-a] [-c] [-o [OUTFILE]] [-f FIGFMT] [-l FIGLENGTH] [-w FIGWIDTH] [-g] [infile]
 """
 
 import argparse
@@ -36,9 +36,9 @@ def visualize_uv(args):
 
     if not args.outfile:
         if args.all_freqs:
-            outfile = 'uv_coverage_all_freqs.png'
+            outfile = 'uv_coverage_all_freqs.%s' % args.figfmt
         else:
-            outfile = 'uv_coverage_%.1f.png' % freqs[args.ifreq]
+            outfile = 'uv_coverage_%.1f.%s' % (freqs[args.ifreq], args.figfmt)
 
     # Plot uv-coverage
     plt.figure(figsize=(args.figlength, args.figwidth))
@@ -56,7 +56,8 @@ parser.add_argument('infile', type=str, nargs='?', help='Input hdf5 data file.')
 parser.add_argument('-i', '--ifreq', type=int, default=0, help='Single frequency channel index.')
 parser.add_argument('-a', '--all_freqs', action='store_true', help='Plot all frequencies uv-coverage if true.')
 parser.add_argument('-c', '--conj', action='store_false', help='Also include conjugate uv points.')
-parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file (png/eps) to save into.')
+parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file to save into.')
+parser.add_argument('-f', '--figfmt', default='pdf', help='Output image format.')
 parser.add_argument('-l', '--figlength', type=float, default=8, help='Output figure length.')
 parser.add_argument('-w', '--figwidth', type=float, default=6, help='Output figure width.')
 parser.add_argument('-g', '--grid', action='store_false', help='Add grids if true.')

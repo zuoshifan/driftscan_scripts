@@ -6,7 +6,7 @@
 :Date: 2014-07-31
 :email: sfzuo@bao.ac.cn
 :usage:
-    python view_vis.py [-h] [-i IFREQ] [-b [BL]] [-f] [-l FIGLENGTH] [-w FIGWIDTH] [indir]
+    python view_vis.py [-h] [--figfmt FIGFMT] [-i IFREQ] [-b [BL]] [-f] [-l FIGLENGTH] [-w FIGWIDTH] [indir]
 """
 
 import argparse
@@ -81,7 +81,7 @@ def visualize_vis(args):
         plt.xlabel(r'$\nu$ / MHz')
         plt.ylabel(r'$\phi$ / rad')
         plt.colorbar()
-        plt.savefig('visibility_2D_%.1f_%.1f.png' % (u, v))
+        plt.savefig('visibility_2D_%.1f_%.1f.%s' % (u, v, args.figfmt))
 
 
     else:
@@ -99,12 +99,13 @@ def visualize_vis(args):
         plt.xlabel('$\phi$ / rad')
         plt.ylabel('Visibility / $K$')
         plt.legend()
-        plt.savefig('visibility_1D_%.1f_%.1f_%.1f.png' % (u, v, freqs[args.ifreq]))
+        plt.savefig('visibility_1D_%.1f_%.1f_%.1f.%s' % (u, v, freqs[args.ifreq], args.figfmt))
 
 
 parser = argparse.ArgumentParser(description='Visualize visibilities.')
 parser.add_argument('indir', type=str, nargs='?', help='Input visibility time stream data files directory.')
 # parser.add_argument('-f', '--filename', nargs='?', default='beam.hdf5', help='Input beam transfer matrix data file name.')
+parser.add_argument('--figfmt', default='pdf', help='Output image format.')
 parser.add_argument('-i', '--ifreq', type=int, default=0, help='Frequency channel to visualize (start from 0). Negative integer N means the last Nth channel.')
 parser.add_argument('-b', '--bl', type=int, nargs='?', default=0, help='Baseline index.')
 parser.add_argument('-f', '--waterfall', action='store_true', help='Plot 2D waterfall figure if present.')

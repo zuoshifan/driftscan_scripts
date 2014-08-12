@@ -14,14 +14,14 @@ import argparse
 
 def mk_single_ps(args):
     """Make a single pointsource healpy map.
-    
+
     Arguments:
     - `args`:
     """
     import numpy as np
     import h5py
     import healpy
-    
+
     ps_map = np.zeros((args.nfreq, args.npol, 12*args.nside**2))
     pix = healpy.ang2pix(args.nside, np.radians(args.theta), np.radians(args.phi))
     for ifreq in range(args.nfreq):
@@ -35,7 +35,7 @@ def mk_single_ps(args):
 parser = argparse.ArgumentParser(description='Make a single pointsource healpy map at a specified position (theta, phi).')
 parser.add_argument('theta', type=float, nargs='?', help='Theta angular coordinates (in degree) of a point on the sphere.')
 parser.add_argument('phi', type=float, nargs='?', help='Phi angular coordinates (in degree) of a point on the sphere.')
-parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the output image file (png/eps) to save into. If not present, the output image file name will be auto created from the input args (png).')
+parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the output file.')
 parser.add_argument('--nside', type=int, default=256, help='Healpix map nside.')
 parser.add_argument('--nfreq', type=int, default=5, help='Number of frequencies channel.')
 parser.add_argument('--freq_lower', type=float, default=700.0, help='Lower freqency.')

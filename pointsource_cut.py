@@ -40,14 +40,14 @@ def cutting(args):
     # Save cut data
     with h5py.File(out_file, 'w') as f:
         f.create_dataset('map', data=cut_map)
-        
+
     print 'done!'
 
 
 
 parser = argparse.ArgumentParser(description='Cut a point source map at a specified brightness temperature, zero is set below the cut threshold.')
 parser.add_argument('pointmap', type=str, nargs='?', help='Input hdf5 point source sky map file.')
-parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the output image file (png/eps) to save into. If not present, the output image file name will be auto created from the input args (png).')
+parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the output hdf5 format healPix map.')
 # parser.add_argument('-p', '--pol', type=int, default=0, choices=range(4), help='Polarization component to visualize, 0 for I/T, 1 for Q, 2 for U, 3 for V.')
 parser.add_argument('-t', '--threshold', type=float, default=1000000.0, help='Cutting shreshold, below which will be set to zero. If less equal than 0, cutting threshold will be set to the max value of the input map.')
 parser.set_defaults(func=cutting)

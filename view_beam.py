@@ -6,7 +6,7 @@
 :Date: 2014-04-02
 :email: sfzuo@bao.ac.cn
 :usage:
-    python view_beam.py [-h] [-o [OUTFILE]] [--lat [LAT]] [--lon [LON]] [-f [FREQ]] [-d [DISH_WIDTH]] [-n [NSIDE]] [--feed [FEED]] [--min MIN] [--max MAX] [-l FIGLENGTH] [-w FIGWIDTH] [-g]
+    python view_beam.py [-h] [-o [OUTFILE]] [--figfmt FIGFMT] [--lat [LAT]] [--lon [LON]] [-f [FREQ]] [-d [DISH_WIDTH]] [-n [NSIDE]] [--feed [FEED]] [--min MIN] [--max MAX] [-l FIGLENGTH] [-w FIGWIDTH] [-g]
 """
 
 import argparse
@@ -32,7 +32,7 @@ def latlon_to_sphpol(latlon):
 
 def beam_circular(angpos, zenith, diameter):
     """Beam pattern for a uniformly illuminated circular dish.
-    
+
     Parameters
     ----------
     angpos : np.ndarray
@@ -41,18 +41,18 @@ def beam_circular(angpos, zenith, diameter):
         Co-ordinates of the zenith.
     diameter : scalar
         Diameter of the dish (in units of wavelength).
-    
+
     Returns
     -------
     beam : np.ndarray
         Beam pattern at each position in angpos.
     """
-    
+
     def jinc(x):
         return 0.5 * (jn(0, x) + jn(2, x))
 
     x = (1.0 - coord.sph_dot(angpos, zenith)**2)**0.5 * np.pi * diameter
-    
+
     return 2*jinc(x)
 
 
@@ -91,7 +91,7 @@ def visualize_beam(args):
     else:
         freq = ('%s'%args.freq).replace('.', '_')
         diameter = ('%s'%args.dish_width).replace('.', '_')
-        out_file = 'beam_resp_%s__%s.png'%(freq, diameter)
+        out_file = 'beam_resp_%s__%s.%s'%(freq, diameter, args.figfmt)
     # Plot and save image
     fig = plt.figure(1, figsize=(args.figlength, args.figwidth))
     title1 = 'X beam pattern, f= %sMHz, d = %sm'%(args.freq, args.dish_width)
@@ -106,7 +106,8 @@ def visualize_beam(args):
 
 
 parser = argparse.ArgumentParser(description='Visualize a dish telescope beam response.')
-parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file (png/eps) to save into. If not present, the output image file name will be auto created from the input args (png).')
+parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file to save into. If not present, the output image file name will be auto created from the input args.')
+parser.add_argument('--figfmt', default='pdf', help='Output image format.')
 parser.add_argument('--lat', type=float, nargs='?', default=30, help='Telescope latitude.')
 parser.add_argument('--lon', type=float, nargs='?', default=0, help='Telescope longitude.')
 parser.add_argument('-f', '--freq', type=float, nargs='?', default=100.0, help='Telescope observing frequency.')

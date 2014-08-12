@@ -66,7 +66,7 @@ def visualize_beam(args):
         plt.ylabel('$(Xl)$')
         plt.title(r'$\Im\left(\mathbf{B}_{\alpha (Xl)}\right)$ for $m = %d$ and $\nu = %.1f$ MHz' % (args.mi, freqs[fi]))
         plt.colorbar()
-        plt.savefig(outdir + mi_subdir + '/beam_%d_%d.png' % (args.mi, fi))
+        plt.savefig(outdir + mi_subdir + '/beam_%d_%d.%s' % (args.mi, fi), args.figfmt)
 
 
 parser = argparse.ArgumentParser(description='Visualize a slice of beam transfer matrix.')
@@ -74,6 +74,7 @@ parser.add_argument('-r', '--root_dir', type=str, nargs='?', default='./', help=
 parser.add_argument('-f', '--filename', nargs='?', default='beam.hdf5', help='Input beam transfer matrix data file name.')
 parser.add_argument('-m', '--mi', type=int, nargs='?', default=0, help='m index.')
 parser.add_argument('-o', '--out_dir', nargs='?', default='beam/', help='Directory of output figures.')
+parser.add_argument('--figfmt', default='pdf', help='Output image format.')
 parser.add_argument('-l', '--figlength', type=float, default=13, help='Output figure length.')
 parser.add_argument('-w', '--figwidth', type=float, default=5, help='Output figure width.')
 parser.set_defaults(func=visualize_beam)

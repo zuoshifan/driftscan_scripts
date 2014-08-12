@@ -6,7 +6,7 @@
 :Date: 2014-04-02
 :email: sfzuo@bao.ac.cn
 :usage:
-    python scatter_view.py [-h] [-o [OUTFILE]] [-i IFREQ] [-p {0,1,2,3}] [--min MIN] [--max MAX] [-w FIGWIDTH] [-t FIGHEIGHT] [-g] mapfiles [mapfiles ...]
+    python scatter_view.py [-h] [-o [OUTFILE]] [-f FIGFMT] [-i IFREQ] [-p {0,1,2,3}] [--min MIN] [--max MAX] [-w FIGWIDTH] [-t FIGHEIGHT] [-g] mapfiles [mapfiles ...]
 """
 
 import argparse
@@ -29,7 +29,7 @@ def scatter_plt(args):
                 hpmap = f['map'][:]
             else:
                 hpmap += f['map'][:]
-                
+
     # Check args validity
     if args.ifreq < 0 and args.ifreq >= (hpmap.shape)[0]:
         raise Exception('Invalid frequency channel %d, should be in range(0, %d).'%(args.ifreq, (hpmap.shape)[0]))
@@ -44,7 +44,7 @@ def scatter_plt(args):
     if args.outfile:
         out_file = args.outfile
     else:
-        out_file = ((args.mapfiles[0].split('/')[-1]).split('.')[0] + '_' + str(args.ifreq) + '_{' + str(args.pol) + '}' +  '.png').format('T', 'Q', 'U', 'V')
+        out_file = ((args.mapfiles[0].split('/')[-1]).split('.')[0] + '_' + str(args.ifreq) + '_{' + str(args.pol) + '}' +  '.' + args.figfrm).format('T', 'Q', 'U', 'V')
 
     # Create a scatter plot of the data
     mean = np.mean(hpmap[args.ifreq][args.pol])
@@ -61,7 +61,8 @@ def scatter_plt(args):
 
 parser = argparse.ArgumentParser(description='Scatter plot a sky map in hdf5 files.')
 parser.add_argument('mapfiles', type=str, nargs='+', help='Input hdf5 sky map files to visualize. If more than one, they will be first combined, i.e. added together.')
-parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file (png/eps) to save into. If not present, the output image file name will be auto create from the first input map file name and input args (png).')
+parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file to save into. If not present, the output image file name will be auto create from the first input map file name and input args.')
+parser.add_argument('-f', '--figfmt', default='pdf', help='Output image format.')
 parser.add_argument('-i', '--ifreq', type=int, default=0, help='Frequency channel to visualize (start from 0).')
 parser.add_argument('-p', '--pol', type=int, default=0, choices=range(4), help='Polarization component to visualize, 0 for I/T, 1 for Q, 2 for U, 3 for V.')
 parser.add_argument('--min', type=float, help='The min value of the visualize range in the output image.')

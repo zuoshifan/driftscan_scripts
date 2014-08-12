@@ -6,7 +6,7 @@
 :Date: 2014-06-16
 :email: sfzuo@bao.ac.cn
 :usage:
-    python alm_dist.py [-h] [-o [OUT_FILE]] [-i [IFREQ]] [-p [POL]] [--maxl [MAXL]] [--lmin [LMIN]] [--lmax [LMAX]] [--mmin [MMIN]] [--mmax [MMAX]] [-l FIGLENGTH] [-w FIGWIDTH] [in_map]
+    python alm_dist.py [-h] [-o [OUT_FILE]] [-f FIGFMT] [-i [IFREQ]] [-p [POL]] [--maxl [MAXL]] [--lmin [LMIN]] [--lmax [LMAX]] [--mmin [MMIN]] [--mmax [MMAX]] [-l FIGLENGTH] [-w FIGWIDTH] [in_map]
 """
 
 import argparse
@@ -24,7 +24,7 @@ def plot_alm(args):
     with h5py.File(args.in_map, 'r') as f:
         in_map = f['map'][...]
     alm = hputil.sphtrans_sky(in_map, lmax=args.maxl)
-    
+
     # plot alm
     plt.figure(figsize=(args.figlength, args.figwidth))
     plt.subplot(121)
@@ -48,13 +48,14 @@ def plot_alm(args):
     plt.ylabel(r'$m$')
     plt.title(r'$\Im\left(a_{lm}\right)$')
     plt.colorbar()
-    out_file = args.out_file or ('alm_of_' + os.path.basename(args.in_map).replace('.hdf5', '_%d_%s.png' % (args.ifreq, ('{%d}' % args.pol).format('T', 'Q', 'U', 'V'))))
+    out_file = args.out_file or ('alm_of_' + os.path.basename(args.in_map).replace('.hdf5', '_%d_%s.%s' % (args.ifreq, ('{%d}' % args.pol).format('T', 'Q', 'U', 'V'), args.figfmt)))
     plt.savefig(out_file)
 
 
 parser = argparse.ArgumentParser(description='Plot the alm distribute of a healpix map.')
 parser.add_argument('in_map', type=str, nargs='?', help='Input hdf5 sky map. If more than one, they will be first combined, i.e. added together.')
-parser.add_argument('-o', '--out_file', type=str, nargs='?', help='Name of the hdf5 map file to save.')
+parser.add_argument('-o', '--out_file', type=str, nargs='?', help='Name of the healpix map file to save.')
+parser.add_argument('-f', '--figfmt', default='pdf', help='Output image format.')
 parser.add_argument('-i', '--ifreq', type=int, nargs='?', default=0, help='Frequency channel index.')
 parser.add_argument('-p', '--pol', type=int, nargs='?', default=0, help='Polarization index.')
 parser.add_argument('--maxl', type=int, nargs='?', help='Max l in the spherical transform.')
@@ -68,5 +69,3 @@ parser.set_defaults(func=plot_alm)
 
 args = parser.parse_args()
 args.func(args)
-
-

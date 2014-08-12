@@ -6,7 +6,7 @@
 :Date: 2014-04-02
 :email: sfzuo@bao.ac.cn
 :usage:
-    python svd_spectrum.py [-h] [-o OUTFILE] [-i IFREQ] [-l FIGLENGTH] [-w FIGWIDTH] [-n AUTOLEVELS] [--lmin LMIN] [--lmax LMAX] [--lint LINT] [filename]
+    python svd_spectrum.py [-h] [-o OUTFILE] [-f FIGFMT] [-i IFREQ] [-l FIGLENGTH] [-w FIGWIDTH] [-n AUTOLEVELS] [--lmin LMIN] [--lmax LMAX] [--lint LINT] [filename]
 """
 
 import argparse
@@ -22,7 +22,7 @@ def plt_svd(args):
     with h5py.File(args.filename, 'r') as f:
         svs = f['singularvalues'][...]
         svs_norm = svs / np.max(svs)
-        
+
     # Check args validity
     if args.ifreq < -(svs.shape)[1] or args.ifreq >= (svs.shape)[1]:
         raise Exception('Invalid frequency channel %d, should be in range(-%d, %d).'%(args.ifreq, (svs.shape)[1], (svs.shape)[1]))
@@ -46,13 +46,14 @@ def plt_svd(args):
     plt.title('SVD spectrum - $\log_{10}(\Sigma / \Sigma_{max})$')
     plt.xlabel('m')
     plt.ylabel('SVD mode')
-    outfile = args.outfile or 'svd_spectrum_%d.png'%ifreq
+    outfile = args.outfile or 'svd_spectrum_%d.%s'% (ifreq, args.figfmt)
     plt.savefig(outfile)
 
 
 parser = argparse.ArgumentParser(description='Plot the SVD spectrum of the B bar matrix.')
 parser.add_argument('filename', type=str, nargs='?', default='svdspectrum.hdf5', help='Input hdf5 svdspectrum file.')
 parser.add_argument('-o', '--outfile', help='Output image file name.')
+parser.add_argument('-f', '--figfmt', default='pdf', help='Output image format.')
 parser.add_argument('-i', '--ifreq', type=int, default=0, help='Frequency channel to visualize (start from 0). Negative integer N means the last Nth channel.')
 parser.add_argument('-l', '--figlength', type=float, default=8, help='Out figure length.')
 parser.add_argument('-w', '--figwidth', type=float, default=6, help='Output figure width.')

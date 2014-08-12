@@ -6,7 +6,7 @@
 :Date: 2014-04-13
 :email: sfzuo@bao.ac.cn
 :usage:
-    python beam_lm.py [-h] [-f [FILENAME]] [-i IFREQ] [-p {0,1,2,3}] [-b BL BL] [--mmax MMAX] [--lmax LMAX] [-a] [-l FIGLENGTH] [-w FIGWIDTH] [indir]
+    python beam_lm.py [-h] [-f [FILENAME]] [-i IFREQ] [-p {0,1,2,3}] [-b BL BL] [--mmax MMAX] [--lmax LMAX] [-a] [-l FIGLENGTH] [-w FIGWIDTH] [--figfmt FIGFMT] [indir]
 """
 
 import argparse
@@ -61,9 +61,9 @@ def visualize_beam_lm(args):
     plt.title('$B_{l,m}$ image')
     plt.colorbar()
     if args.single_bl:
-        plt.savefig('beam_lm_%d_%d_%d_%d_%d_%d.png' % (freq, args.pol, args.bl[0], args.bl[1], beam_lms.shape[1], beam_lms.shape[0]))  # lmax, mmax
+        plt.savefig('beam_lm_%d_%d_%d_%d_%d_%d.%s' % (freq, args.pol, args.bl[0], args.bl[1], beam_lms.shape[1], beam_lms.shape[0], args.figfmt))  # lmax, mmax
     else:
-        plt.savefig('beam_lm_%d_%d_all_bl_%d_%d.png' % (freq, args.pol, beam_lms.shape[1], beam_lms.shape[0]))  # lmax, mmax
+        plt.savefig('beam_lm_%d_%d_all_bl_%d_%d.%s' % (freq, args.pol, beam_lms.shape[1], beam_lms.shape[0], args.figfmt))  # lmax, mmax
 
 
 parser = argparse.ArgumentParser(description='Visualize `lm` slice of beam transfer matrix.')
@@ -80,6 +80,7 @@ parser.add_argument('-a', '--single_bl', action='store_true', help='Plot single 
 # parser.add_argument('--max', type=float, help='The max value of the visualize range in the output image.')
 parser.add_argument('-l', '--figlength', type=float, default=13, help='Output figure length.')
 parser.add_argument('-w', '--figwidth', type=float, default=5, help='Output figure width.')
+parser.add_argument('--figfmt', default='pdf', help='Output image format.')
 parser.set_defaults(func=visualize_beam_lm)
 
 args = parser.parse_args()

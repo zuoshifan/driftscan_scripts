@@ -34,7 +34,7 @@ if mpiutil.rank0:
     alm = hputil.sphtrans_sky(skymap, lmax=cyl.lmax)
 else:
     alm = None
-    
+
 alm = mpiutil.world.bcast(alm, root=0)
 
 
@@ -89,9 +89,8 @@ if mpiutil.rank0:
         suffix = '.' + args.outfile.split('.')[-1]
         outfile1 = args.outfile.replace(suffix, '_beamproj'+suffix)
         outfile2 = args.outfile.replace(suffix, '_dirtymap'+suffix)
-    
+
     with h5py.File(outfile1, 'w') as f:
         f.create_dataset('/map', data=beamp_map)
     with h5py.File(outfile2, 'w') as f:
         f.create_dataset('/map', data=dirty_map)
-

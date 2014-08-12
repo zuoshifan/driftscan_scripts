@@ -6,7 +6,7 @@
 :Date: 2014-04-08
 :email: sfzuo@bao.ac.cn
 :usage:
-    python 
+    python 21cm_ps.py [-h] [--k_start K_START] [--k_end K_END] [--k_num K_NUM] [--kpar_start KPAR_START] [--kpar_end KPAR_END] [--kpar_num KPAR_NUM] [--kperp_start KPERP_START] [--kperp_end KPERP_END] [--kperp_num KPERP_NUM] [--ps2d] [-o OUT_FILE] [--log]
 """
 
 import argparse
@@ -14,7 +14,6 @@ import numpy as np
 import h5py
 
 from cora.signal import corr21cm
-
 
 
 def compute_ps(args):

@@ -37,8 +37,13 @@ def visualize_cart(args):
     plt.imshow(cart_map, extent=ext, origin='lower', vmin=args.vmin, vmax=args.vmax)
     plt.xlabel('RA / deg')
     plt.ylabel('DEC / deg')
-    plt.colorbar()
-    plt.savefig(out_file)
+    cbar = plt.colorbar()
+    cbar.solids.set_rasterized(True) # eliminate lines in colorbar for PDF output, see http://matplotlib.1069221.n5.nabble.com/rasterized-colorbar-td39582.html
+    ## can not completely eliminate lines in colorbar, see http://matplotlib.org/api/pyplot_api.html?highlight=colorbar#matplotlib.pyplot.colorbar
+    # cbar.solids.set_edgecolor("face")
+    # plt.draw()
+    ## -----------------------------------------------------
+    plt.savefig(out_file, bbox_inches='tight')
 
 
 parser = argparse.ArgumentParser(description='Visualize a cartesian sky map.')

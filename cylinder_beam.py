@@ -17,6 +17,7 @@ def visualize_cyl_beam(args):
     """
     import numpy as np
     import healpy
+    import hpvisual
     from drift.telescope import cylinder as cyl
     # from drift.core import telescope as tel
     from cora.util import hputil
@@ -45,12 +46,12 @@ def visualize_cyl_beam(args):
         fig1 = plt.figure(1, figsize=(args.figlength, 2*args.figwidth))
         title11 = 'X feed theta direction, f = %s MHz, w = %s m'%(args.freq, args.cyl_width)
         title12 = 'X feed phi direction, f = %s MHz, w = %s m'%(args.freq, args.cyl_width)
-        healpy.mollview(beamx_resp[:, 0], fig=1, sub=221, title=title11, min=args.min, max=args.max)
-        healpy.mollview(beamx_resp[:, 1], fig=1, sub=222, title=title12, min=args.min, max=args.max)
+        hpvisual.mollview(beamx_resp[:, 0], fig=1, sub=221, title=title11, min=args.min, max=args.max)
+        hpvisual.mollview(beamx_resp[:, 1], fig=1, sub=222, title=title12, min=args.min, max=args.max)
         title21 = 'Y feed theta direction, f = %s MHz, w = %s m'%(args.freq, args.cyl_width)
         title22 = 'Y feed phi direction, f = %s MHz, w = %s m'%(args.freq, args.cyl_width)
-        healpy.mollview(beamy_resp[:, 0], fig=1, sub=223, title=title21, min=args.min, max=args.max)
-        healpy.mollview(beamy_resp[:, 1], fig=1, sub=224, title=title22, min=args.min, max=args.max)
+        hpvisual.mollview(beamy_resp[:, 0], fig=1, sub=223, title=title21, min=args.min, max=args.max)
+        hpvisual.mollview(beamy_resp[:, 1], fig=1, sub=224, title=title22, min=args.min, max=args.max)
         if args.grid:
             healpy.graticule()
         fig1.savefig(out_file)
@@ -63,7 +64,7 @@ def visualize_cyl_beam(args):
 
         # Plot the R_{I to I}response
         fig2 = plt.figure(2, figsize=(args.figlength, args.figwidth))
-        healpy.mollview(II_resp, fig=2, min=args.min, max=args.max)
+        hpvisual.mollview(II_resp, fig=2, min=args.min, max=args.max)
         if args.grid:
             healpy.graticule()
         fig2.savefig('II_mollview' + out_file)
@@ -71,7 +72,7 @@ def visualize_cyl_beam(args):
 
         # Plot the R_{P to I}response
         fig3 = plt.figure(3, figsize=(args.figlength, args.figwidth))
-        healpy.mollview(PI_resp, fig=3, min=args.min, max=args.max)
+        hpvisual.mollview(PI_resp, fig=3, min=args.min, max=args.max)
         if args.grid:
             healpy.graticule()
         fig3.savefig('PI_mollview' + out_file)
@@ -82,7 +83,7 @@ def visualize_cyl_beam(args):
         lon_range = [-10, 10]
         ext = (-10, 10, -90, 90)
         # R_{I to I } cartesian
-        II_cart = healpy.cartview(II_resp, lonra=lon_range, return_projected_map=True)
+        II_cart = hpvisual.cartview(II_resp, lonra=lon_range, return_projected_map=True)
         ticks = np.linspace(np.min(II_cart), np.max(II_cart), 6)
         ticks = np.around(ticks, decimals=1)
         plt.figure(figsize=(4, 5))
@@ -91,10 +92,11 @@ def visualize_cyl_beam(args):
         ax.yaxis.set_major_locator(MultipleLocator(30))
         plt.xlabel('EW / deg')
         plt.ylabel('NS / deg')
-        plt.colorbar(shrink=0.6 ,orientation='horizontal', ticks=ticks)
+        cbar = plt.colorbar(shrink=0.6 ,orientation='horizontal', ticks=ticks)
+        cbar.solids.set_rasterized(True)
         plt.savefig('II_cartview_' + out_file)
         # R_{P to I } cartesian
-        PI_cart = healpy.cartview(PI_resp, lonra=lon_range, return_projected_map=True)
+        PI_cart = hpvisual.cartview(PI_resp, lonra=lon_range, return_projected_map=True)
         ticks = np.linspace(np.min(PI_cart), np.max(PI_cart), 4)
         ticks = np.around(ticks, decimals=2)
         plt.figure(figsize=(4, 5))
@@ -103,7 +105,8 @@ def visualize_cyl_beam(args):
         ax.yaxis.set_major_locator(MultipleLocator(30))
         plt.xlabel('EW / deg')
         plt.ylabel('NS / deg')
-        plt.colorbar(shrink=0.6 ,orientation='horizontal', ticks=ticks)
+        cbar = plt.colorbar(shrink=0.6 ,orientation='horizontal', ticks=ticks)
+        cbar.solids.set_rasterized(True)
         plt.savefig('PI_cartview_' + out_file)
 
     else:
@@ -122,7 +125,7 @@ def visualize_cyl_beam(args):
         # Plot and save image
         fig = plt.figure(1, figsize=(args.figlength, args.figwidth))
         title = 'Beam pattern, f = %s MHz, w = %s m'%(args.freq, args.cyl_width)
-        healpy.mollview(beam_amp, fig=1, sub=111, coord='G', title=title, min=args.min, max=args.max)
+        hpvisual.mollview(beam_amp, fig=1, sub=111, coord='G', title=title, min=args.min, max=args.max)
         if args.grid:
             healpy.graticule()
         fig.savefig(out_file)
@@ -132,7 +135,7 @@ def visualize_cyl_beam(args):
 
 parser = argparse.ArgumentParser(description='Visualize cylinder telescope beam response.')
 parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file to save into. If not present, the output image file name will be auto created from the input args.')
-parser.add_argument('--figfmt', default='pdf', help='Output image format.')
+parser.add_argument('--figfmt', default='png', help='Output image format.')
 parser.add_argument('--lat', type=float, nargs='?', default=45, help='Telescope latitude.')
 parser.add_argument('--lon', type=float, nargs='?', default=0, help='Telescope longitude.')
 parser.add_argument('-f', '--freq', type=float, nargs='?', default=700.0, help='Telescope observing frequency.')

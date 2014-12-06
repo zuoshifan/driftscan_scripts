@@ -31,6 +31,7 @@ def visualize_vis(args):
         baselines = f['baselines'][...]
         tphi = f['phi'][...]
         freqs = f['frequencies'][...]
+    print 'Number of baselines: ', baselines.shape[0]
     u = baselines[args.bl, 0] # m, EW direction
     v = baselines[args.bl, 1] # m, NS direction
     phi = np.linspace(0, 2*np.pi, tphi.shape[0]+1, endpoint=True)
@@ -73,14 +74,19 @@ def visualize_vis(args):
         plt.ylim(phi[-1], phi[0])
         plt.xlabel(r'$\nu$ / MHz')
         plt.ylabel(r'$\phi$ / rad')
-        plt.colorbar()
+        cbar = plt.colorbar()
+        if args.figfmt == 'pdf':
+            cbar.solids.set_rasterized(True)
 
         plt.subplot(122)
         plt.pcolor(freqs_bound, phi, ts.T[::-1, :].imag)
         plt.ylim(phi[-1], phi[0])
         plt.xlabel(r'$\nu$ / MHz')
         plt.ylabel(r'$\phi$ / rad')
-        plt.colorbar()
+        cbar = plt.colorbar()
+        if args.figfmt == 'pdf':
+            cbar.solids.set_rasterized(True)
+
         plt.savefig('visibility_2D_%.1f_%.1f.%s' % (u, v, args.figfmt))
 
 
@@ -105,7 +111,7 @@ def visualize_vis(args):
 parser = argparse.ArgumentParser(description='Visualize visibilities.')
 parser.add_argument('indir', type=str, nargs='?', help='Input visibility time stream data files directory.')
 # parser.add_argument('-f', '--filename', nargs='?', default='beam.hdf5', help='Input beam transfer matrix data file name.')
-parser.add_argument('--figfmt', default='pdf', help='Output image format.')
+parser.add_argument('--figfmt', default='png', help='Output image format.')
 parser.add_argument('-i', '--ifreq', type=int, default=0, help='Frequency channel to visualize (start from 0). Negative integer N means the last Nth channel.')
 parser.add_argument('-b', '--bl', type=int, nargs='?', default=0, help='Baseline index.')
 parser.add_argument('-f', '--waterfall', action='store_true', help='Plot 2D waterfall figure if present.')

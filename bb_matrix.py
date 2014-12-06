@@ -77,7 +77,7 @@ parser.add_argument('-r', '--root_dir', type=str, nargs='?', default='./', help=
 parser.add_argument('-f', '--filename', nargs='?', default='beam.hdf5', help='Input beam transfer matrix data file name.')
 parser.add_argument('-m', '--mi', type=int, nargs='?', default=0, help='m index.')
 parser.add_argument('-o', '--out_dir', nargs='?', default='bb/', help='Directory of output figures.')
-parser.add_argument('--figfmt', default='pdf', help='Output image format.')
+parser.add_argument('--figfmt', default='png', help='Output image format.')
 parser.add_argument('-l', '--figlength', type=float, default=13, help='Output figure length.')
 parser.add_argument('-w', '--figwidth', type=float, default=5, help='Output figure width.')
 parser.set_defaults(func=visualize_bb)

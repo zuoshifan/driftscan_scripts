@@ -81,7 +81,7 @@ def plt_sn(args):
 parser = argparse.ArgumentParser(description='Plot the S/N or S/F spectrum of the KL transform.')
 parser.add_argument('filename', type=str, nargs='?', default='evals.hdf5', help='Input hdf5 evals file.')
 parser.add_argument('-o', '--outfile', help='Output image file name.')
-parser.add_argument('-f', '--figfmt', default='pdf', help='Output image format.')
+parser.add_argument('-f', '--figfmt', default='png', help='Output image format.')
 parser.add_argument('-l', '--figlength', type=float, default=8, help='Out figure length.')
 parser.add_argument('-w', '--figwidth', type=float, default=6, help='Output figure width.')
 parser.add_argument('-n', '--autolevels', type=int, default=200, help='contour N automatically-chosen levels.')

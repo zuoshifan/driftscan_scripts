@@ -27,6 +27,14 @@ parser.add_argument('-o', '--out_file', help='Output name file name.')
 args = parser.parse_args()
 
 
+def bl_sort(bl):
+    """Sort baselines vector to point to East or North if no East component."""
+    u, v, w = bl
+    if u < 1.0e-8:
+        return bl if v >= 0 else -1.0 * bl
+    return bl if u > 0 else -1.0 * bl
+
+
 # transform matrix from local coordinate (`x` points toward East, `y` points toward North, `z` points toward the Zenith) to equatorial coordinate (`X` points toward the local meridian in the `yz` plane, `Z` points toward the North pole, `Y` is perpendicular to `X` and `Z` and they together construct a right hand coordinate)
 R = np.array([[0.0, -np.sqrt(2)/2.0, np.sqrt(2)/2.0],
               [1.0, 0.0, 0.0],
@@ -53,15 +61,24 @@ elif args.case == 2:
         for feed in range(nfeeds[cyl]):
             local_pos.append(np.array([cyl * cyl_w, feed * feeds_spacing[cyl], 0.0]))
 
-# feeds positions in equatorial coordinate
-eq_pos = [np.dot(R, pos) for pos in local_pos]
-pos_len = len(eq_pos)
-# baseline vectors in equatorial coordinate
+pos_len = len(local_pos)
 auto_corr = args.auto_corr
 if auto_corr:
-    bls = [(eq_pos[pos1] - eq_pos[pos2]) for pos1 in range(pos_len) for pos2 in range(pos1, pos_len)]
+    bls = [bl_sort(local_pos[pos1] - local_pos[pos2]) for pos1 in range(pos_len) for pos2 in range(pos1, pos_len)]
 else:
-    bls = [(eq_pos[pos1] - eq_pos[pos2]) for pos1 in range(pos_len) for pos2 in range(pos1+1, pos_len)]
+    bls = [bl_sort(local_pos[pos1] - local_pos[pos2]) for pos1 in range(pos_len) for pos2 in range(pos1+1, pos_len)]
+# transform baselines to equatorial coordinate
+bls = [np.dot(R, bl) for bl in bls]
+
+# # feeds positions in equatorial coordinate
+# eq_pos = [np.dot(R, pos) for pos in local_pos]
+# pos_len = len(eq_pos)
+# # baseline vectors in equatorial coordinate
+# auto_corr = args.auto_corr
+# if auto_corr:
+#     bls = [(eq_pos[pos1] - eq_pos[pos2]) for pos1 in range(pos_len) for pos2 in range(pos1, pos_len)]
+# else:
+#     bls = [(eq_pos[pos1] - eq_pos[pos2]) for pos1 in range(pos_len) for pos2 in range(pos1+1, pos_len)]
 
 # observing frequency
 freq = args.freq # MHz

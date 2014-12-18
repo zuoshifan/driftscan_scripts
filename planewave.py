@@ -94,6 +94,11 @@ for uvec in uvecs:
     # enus += np.exp(2*np.pi*1.0J*np.abs(uvec[0] * nx + uvec[1] * ny + uvec[2] * nz))
     enus += np.exp(2*np.pi*1.0J*(uvec[0] * nx + uvec[1] * ny + uvec[2] * nz))
 
+# save enus (synthesized beam?)
+outenus = 'enus_%d_%.1f_%s_case%d.hdf5' % (args.nside, args.freq, args.auto_corr, args.case)
+with h5py.File(outenus, 'w') as f:
+    f.create_dataset('map', data=enus)
+
 # spherical harmonic transform
 alm = hputil.sphtrans_complex(enus, centered=True)
 

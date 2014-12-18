@@ -28,7 +28,7 @@ def plot_alm(args):
     # plot alm
     plt.figure(figsize=(args.figlength, args.figwidth))
     plt.subplot(121)
-    plt.pcolor(alm[args.ifreq, args.pol].T.real)
+    plt.pcolor(alm[args.ifreq, args.pol].T.real, vmin=args.min, vmax=args.max)
     lmin = args.lmin or 0
     lmax = args.lmax or alm.shape[-2]
     mmin = args.mmin or 0
@@ -41,7 +41,7 @@ def plot_alm(args):
     plt.colorbar()
 
     plt.subplot(122)
-    plt.pcolor(alm[args.ifreq, args.pol].T.imag)
+    plt.pcolor(alm[args.ifreq, args.pol].T.imag, vmin=args.min, vmax=args.max)
     plt.xlim(lmin, lmax)
     plt.ylim(mmin, mmax)
     plt.xlabel(r'$l$')
@@ -63,6 +63,8 @@ parser.add_argument('--lmin', type=int, nargs='?', help='Min l to plot.')
 parser.add_argument('--lmax', type=int, nargs='?', help='Max l to plot.')
 parser.add_argument('--mmin', type=int, nargs='?', help='Min m to plot.')
 parser.add_argument('--mmax', type=int, nargs='?', help='Max m to plot.')
+parser.add_argument('--min', type=float, help='The min value of the visualize range in the output image.')
+parser.add_argument('--max', type=float, help='The max value of the visualize range in the output image.')
 parser.add_argument('-l', '--figlength', type=float, default=13, help='Output figure length.')
 parser.add_argument('-w', '--figwidth', type=float, default=5, help='Output figure width.')
 parser.set_defaults(func=plot_alm)

@@ -87,7 +87,7 @@ def visualize_vis(args):
         if args.figfmt == 'pdf':
             cbar.solids.set_rasterized(True)
 
-        plt.savefig('visibility_2D_%.1f_%.1f.%s' % (u, v, args.figfmt))
+        plt.savefig('visibility_2D_%.1f_%.1f_%d.%s' % (u, v, args.bl, args.figfmt))
 
 
     else:
@@ -105,7 +105,7 @@ def visualize_vis(args):
         plt.xlabel('$\phi$ / rad')
         plt.ylabel('Visibility / $K$')
         plt.legend()
-        plt.savefig('visibility_1D_%.1f_%.1f_%.1f.%s' % (u, v, freqs[args.ifreq], args.figfmt))
+        plt.savefig('visibility_1D_%.1f_%.1f_%d_%.1f.%s' % (u, v, args.bl, freqs[args.ifreq], args.figfmt))
 
 
 parser = argparse.ArgumentParser(description='Visualize visibilities.')

@@ -21,7 +21,7 @@ from cora.util import hputil
 
 # Read in arguments
 parser = argparse.ArgumentParser(description="compute the synthesized beam of an cylinder array and its spherical harmonic coefficients.")
-parser.add_argument('-c', '--case', type=int, choices=[1, 2], default=1, help='Which array configuration, 1 for 32+32+32 case, 2 for 31+32+33 case.')
+parser.add_argument('-c', '--case', type=int, choices=[1, 2, 3], default=1, help='Which array configuration, 1 for 32+32+32 case, 2 for 31+32+33 case.')
 parser.add_argument('--lat', type=float, nargs='?', default=45, help='Telescope latitude.')
 parser.add_argument('--lon', type=float, nargs='?', default=90, help='Telescope longitude.')
 parser.add_argument('-a', '--auto_corr', action='store_false', help='Whether use auto correlation.')
@@ -37,6 +37,8 @@ if args.case == 1:
     cyl = cylinder.PolarisedCylinderTelescope(args.lat, args.lon)
 elif args.case == 2:
     cyl = exotic_cylinder.UnequalFeedsCylinder(args.lat, args.lon)
+elif args.case == 3:
+    cyl = exotic_cylinder.ArbitraryPolarisedCylinder(args.lat, args.lon)
 else:
     raise Exception('Unsupported case: %d' % args.case)
 
@@ -50,8 +52,8 @@ cyl.freq_upper = args.freq + 10.0
 
 
 # Set the properties of the cylinders
-# cyl.num_cylinders = 3
-cyl.num_cylinders = 1
+cyl.num_cylinders = 3
+# cyl.num_cylinders = 1
 cyl.cylinder_width = 15.0
 if args.case == 1:
     cyl.num_feeds = 32
@@ -60,6 +62,17 @@ if args.case == 1:
 elif args.case == 2:
     cyl.num_feeds = [31, 32, 33]
     cyl.feed_spacing = [12.4/30, 0.4, 12.4/32]
+elif args.case == 3:
+    cyl.num_feeds = 32
+    D1 = 0.8
+    D2 = 1.0
+    D3 = 1.1
+    cyl1_sp = [D1] * 10 + [D3] * 5 + [D2] + [D3] * 15 # spacing between adjacent feeds
+    cyl2_sp = [D3] * 10 + [D1] * 5 + [D2] + [D1] * 5 + [D3] * 10
+    cyl3_sp = [D3] * 15 + [D2] + [D3] * 5 + [D1] * 10
+    cyl.feed_spacing = [np.cumsum(np.insert(cyl1_sp, 0, 0)).tolist(),
+                        np.cumsum(np.insert(cyl2_sp, 0, 0)).tolist(),
+                        np.cumsum(np.insert(cyl3_sp, 0, 0)).tolist()]
 
 # Set the thermal noise (T_sys flat across spectrum)
 cyl.tsys_flat = 50.0

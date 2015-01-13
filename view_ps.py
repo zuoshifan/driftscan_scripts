@@ -251,10 +251,14 @@ def plt_fisher(args):
 
     # Plot power spectrum
     if polar:
-        ps = [uw_ps, uc_ps, mv_ps, iv_ps]
-        err = [uw_err, uc_err, mv_err, iv_err]
-        lt = ['bo', 'gs', 'r*', 'c^']
-        pt = ['Unwindowed', 'Uncorrelated', 'Minimum variance', 'Inverse variance']
+        # ps = [uw_ps, uc_ps, mv_ps, iv_ps]
+        # err = [uw_err, uc_err, mv_err, iv_err]
+        # lt = ['bo', 'gs', 'r*', 'c^']
+        # pt = ['Unwindowed', 'Uncorrelated', 'Minimum variance', 'Inverse variance']
+        ps = [uw_ps, uc_ps, mv_ps]
+        err = [uw_err, uc_err, mv_err]
+        lt = ['bo', 'gs', 'r*']
+        pt = ['Unwindowed', 'Uncorrelated', 'Minimum variance']
         # Unwindowed
         ps_1d_plot(tk_center, tps1d, k_center, ps[0], err[0], line_type=lt[0], ps_type=pt[0], figname=uw_dir + ps_name, xmin=args.xmin, xmax=args.xmax, ymin=args.ymin, ymax=args.ymax)
         # Uncorrelated
@@ -262,7 +266,7 @@ def plt_fisher(args):
         # Minimum variance
         ps_1d_plot(tk_center, tps1d, k_center, ps[2], err[2], line_type=lt[2], ps_type=pt[2], figname=mv_dir + ps_name, xmin=args.xmin, xmax=args.xmax, ymin=args.ymin, ymax=args.ymax)
         # Inverse variance
-        ps_1d_plot(tk_center, tps1d, k_center, ps[3], err[3], line_type=lt[3], ps_type=pt[3], figname=iv_dir + ps_name, xmin=args.xmin, xmax=args.xmax, ymin=args.ymin, ymax=args.ymax)
+        # ps_1d_plot(tk_center, tps1d, k_center, ps[3], err[3], line_type=lt[3], ps_type=pt[3], figname=iv_dir + ps_name, xmin=args.xmin, xmax=args.xmax, ymin=args.ymin, ymax=args.ymax)
         # All together
         ps_1d_plot(tk_center, tps1d, k_center, ps, err, line_type=lt, ps_type=pt, figname=ps_name, xmin=args.xmin, xmax=args.xmax, ymin=args.ymin, ymax=args.ymax)
 

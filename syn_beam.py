@@ -57,8 +57,8 @@ cyl.num_cylinders = 3
 cyl.cylinder_width = 15.0
 if args.case == 1:
     cyl.num_feeds = 32
-    # cyl.feed_spacing = 0.4
-    cyl.feed_spacing = 1.2
+    cyl.feed_spacing = 0.4
+    # cyl.feed_spacing = 1.2
 elif args.case == 2:
     cyl.num_feeds = [31, 32, 33]
     cyl.feed_spacing = [12.4/30, 0.4, 12.4/32]

@@ -26,6 +26,7 @@ parser.add_argument('--lat', type=float, nargs='?', default=45, help='Telescope 
 parser.add_argument('--lon', type=float, nargs='?', default=90, help='Telescope longitude.')
 parser.add_argument('-a', '--auto_corr', action='store_false', help='Whether use auto correlation.')
 parser.add_argument('-m', '--mask_horizon', action='store_false', help='Whether mask out below horizon.')
+parser.add_argument('-p', '--primary_beam', action='store_true', help='Multiply primary beam if True.')
 parser.add_argument('-f', '--freq', type=float, default=750.0, help='Observing frequency.')
 parser.add_argument('-n', '--nside', type=int, default=256, help='Healpix nside.')
 parser.add_argument('-o', '--outfile', help='Output name file name.')
@@ -90,32 +91,40 @@ angpos = cyl._angpos
 horizon = cyl._horizon
 wavelength = cyl.wavelengths[1] # central wavelength, corresponding to args.freq
 
+Nbl = len(cyl.baselines) # number of baselines
 enus = 0.0
-if args.mask_horizon:
-    for (n, bl) in zip(cyl.redundancy, cyl.baselines):
-        uv = bl / wavelength
+for (n, bi) in zip(cyl.redundancy, range(Nbl)):
+    if args.primary_beam:
+        enus += n * np.array(cyl._beam_map_single(bi, (cyl.num_freq - 1)/2))
+    else:
+        uv = cyl.baselines[bi] / wavelength
         fringe = visibility.fringe(angpos, cyl.zenith, uv)
-        enus += n * fringe * horizon
-else:
-    for (n, bl) in zip(cyl.redundancy, cyl.baselines):
-        uv = bl / wavelength
-        fringe = visibility.fringe(angpos, cyl.zenith, uv)
-        enus += n * fringe
+        if args.mask_horizon:
+            enus += n * fringe * horizon
+        else:
+            enus += n * fringe
 
 if args.outfile is not None:
     outenus = 'enus_' + args.outfile
     outpalms = 'palms_' + args.out_file
 else:
-    outenus = 'enus_%d_%.1f_%.1f_%.1f_%s_case%d_%s.hdf5' % (args.nside, args.freq, args.lat, args.lon, args.auto_corr, args.case, args.mask_horizon)
-    outpalms = 'palms_%d_%.1f_%.1f_%.1f_%s_case%d_%s.hdf5' % (args.nside, args.freq, args.lat, args.lon, args.auto_corr, args.case, args.mask_horizon)
+    if args.primary_beam:
+        outenus = 'enus_%d_%.1f_%.1f_%.1f_%s_case%d_%s.hdf5' % (args.nside, args.freq, args.lat, args.lon, args.auto_corr, args.case, 'p')
+        outpalms = 'palms_%d_%.1f_%.1f_%.1f_%s_case%d_%s.hdf5' % (args.nside, args.freq, args.lat, args.lon, args.auto_corr, args.case, 'p')
+    else:
+        outenus = 'enus_%d_%.1f_%.1f_%.1f_%s_case%d_%s.hdf5' % (args.nside, args.freq, args.lat, args.lon, args.auto_corr, args.case, args.mask_horizon)
+        outpalms = 'palms_%d_%.1f_%.1f_%.1f_%s_case%d_%s.hdf5' % (args.nside, args.freq, args.lat, args.lon, args.auto_corr, args.case, args.mask_horizon)
 
 # save enus (synthesized beam?)
 with h5py.File(outenus, 'w') as f:
     f.create_dataset('map', data=enus)
 
 # spherical harmonic transform
-alm = hputil.sphtrans_complex(enus, centered=True)
+if args.primary_beam:
+    alm = hputil.sphtrans_complex_pol([enus[0], enus[1], enus[2], enus[3]], centered=True)
+else:
+    alm = hputil.sphtrans_complex(enus, centered=True)
 
 # save data
 with h5py.File(outpalms, 'w') as f:
-    f.create_dataset('alm', data=alm)
+    f.create_dataset('alm', data=np.array(alm))

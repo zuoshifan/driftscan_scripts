@@ -41,6 +41,8 @@ def visualize_map(args):
         raise Exception('Figure width figwidth (= %f) must greater than 0'%args.figwidth)
 
     # chose appropriate data
+    if hpmap.ndim == 2:
+        hpmap = hpmap[args.pol]
     if args.data == 'a':
         hpmap = np.abs(hpmap)
         data = 'abs'
@@ -95,7 +97,7 @@ parser.add_argument('--log', action='store_true', help='Log plot if True')
 parser.add_argument('-v', '--view', type=str, choices=['m', 'g'], default='m', help='Which view, `m` for mollview, `g` for gnomview.')
 parser.add_argument('-f', '--figfmt', default='png', help='Output image format.')
 # parser.add_argument('-i', '--ifreq', type=int, default=0, help='Frequency channel to visualize (start from 0). Negative integer N means the last Nth channel.')
-# parser.add_argument('-p', '--pol', type=int, default=0, choices=range(4), help='Polarization component to visualize, 0 for I/T, 1 for Q, 2 for U, 3 for V.')
+parser.add_argument('-p', '--pol', type=int, default=0, choices=range(4), help='Polarization component to visualize, 0 for I/T, 1 for Q, 2 for U, 3 for V.')
 parser.add_argument('--min', type=float, help='The min value of the visualize range in the output image.')
 parser.add_argument('--max', type=float, help='The max value of the visualize range in the output image.')
 parser.add_argument('-l', '--figlength', type=float, default=13, help='Output figure length.')

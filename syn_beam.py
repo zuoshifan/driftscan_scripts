@@ -21,7 +21,7 @@ from cora.util import hputil
 
 # Read in arguments
 parser = argparse.ArgumentParser(description="compute the synthesized beam of an cylinder array and its spherical harmonic coefficients.")
-parser.add_argument('-c', '--case', type=int, choices=[1, 2, 3], default=1, help='Which array configuration, 1 for 32+32+32 case, 2 for 31+32+33 case.')
+parser.add_argument('-c', '--case', type=int, choices=[1, 2, 3, 4], default=1, help='Which array configuration, 1 for 32+32+32 case, 2 for 31+32+33 case.')
 parser.add_argument('--lat', type=float, nargs='?', default=45, help='Telescope latitude.')
 parser.add_argument('--lon', type=float, nargs='?', default=90, help='Telescope longitude.')
 parser.add_argument('-a', '--auto_corr', action='store_false', help='Whether use auto correlation.')
@@ -40,6 +40,8 @@ elif args.case == 2:
     cyl = exotic_cylinder.UnequalFeedsCylinder(args.lat, args.lon)
 elif args.case == 3:
     cyl = exotic_cylinder.ArbitraryPolarisedCylinder(args.lat, args.lon)
+elif args.case == 4:
+    cyl = exotic_cylinder.UnequalFeedsCylinder(args.lat, args.lon)
 else:
     raise Exception('Unsupported case: %d' % args.case)
 
@@ -74,6 +76,9 @@ elif args.case == 3:
     cyl.feed_spacing = [np.cumsum(np.insert(cyl1_sp, 0, 0)).tolist(),
                         np.cumsum(np.insert(cyl2_sp, 0, 0)).tolist(),
                         np.cumsum(np.insert(cyl3_sp, 0, 0)).tolist()]
+elif args.case == 4:
+    cyl.num_feeds = [31, 32, 33]
+    cyl.feed_spacing = [31.0/30, 1.0, 31.0/32]
 
 # Set the thermal noise (T_sys flat across spectrum)
 cyl.tsys_flat = 50.0

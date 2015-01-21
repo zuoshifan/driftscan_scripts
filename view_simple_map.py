@@ -71,9 +71,9 @@ def visualize_map(args):
     elif args.view == 'g':
         fig = plt.figure(1, figsize=(8, 6))
         if args.log:
-            healpy.gnomview(np.log10(hpmap), fig=1, title='', rot=(90.0, 45.0, 0.0), xsize=20000, reso=2.0, degree=False, min=args.min, max=args.max, notext=True)
+            healpy.gnomview(np.log10(hpmap), fig=1, title='', rot=(90.0, 45.0, 0.0), xsize=args.xsize, ysize=args.ysize, reso=2.0, degree=False, min=args.min, max=args.max, notext=True)
         else:
-            healpy.gnomview(hpmap, fig=1, title='', rot=(90.0, 45.0, 0.0), xsize=20000, reso=2.0, degree=False, min=args.min, max=args.max, notext=True)
+            healpy.gnomview(hpmap, fig=1, title='', rot=(90.0, 45.0, 0.0), xsize=args.xsize, ysize=args.ysize, reso=2.0, degree=False, min=args.min, max=args.max, notext=True)
 
         # healpy.gnomview(hpmap, fig=1, title='', xsize=10000)
     # healpy.cartview(hpmap[ifreq][args.pol], fig=1, title='', min=args.min, max=args.max)
@@ -100,6 +100,8 @@ parser.add_argument('-f', '--figfmt', default='png', help='Output image format.'
 parser.add_argument('-p', '--pol', type=int, default=0, choices=range(4), help='Polarization component to visualize, 0 for I/T, 1 for Q, 2 for U, 3 for V.')
 parser.add_argument('--min', type=float, help='The min value of the visualize range in the output image.')
 parser.add_argument('--max', type=float, help='The max value of the visualize range in the output image.')
+parser.add_argument('-x', '--xsize', type=int, default=20000, help='The size of the image along x axes.')
+parser.add_argument('-y', '--ysize', type=int, default=None, help='The size of the image along y axes.')
 parser.add_argument('-l', '--figlength', type=float, default=13, help='Output figure length.')
 parser.add_argument('-w', '--figwidth', type=float, default=5, help='Output figure width.')
 parser.add_argument('-g', '--grid', action='store_false', help='Add meridians and parallels.')

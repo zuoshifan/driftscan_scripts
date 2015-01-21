@@ -24,6 +24,9 @@ def plot_alm(args):
     with h5py.File(args.in_file, 'r') as f:
         alm = f['alm'][...]
 
+    if alm.ndim == 3:
+        alm = alm[args.pol]
+        
     # mask |m| > l values
     mask = np.zeros_like(alm, dtype=np.bool)
     for row in range(mask.shape[0]):
@@ -65,6 +68,7 @@ parser.add_argument('--mmin', type=int, nargs='?', help='Min m to plot.')
 parser.add_argument('--mmax', type=int, nargs='?', help='Max m to plot.')
 parser.add_argument('--vmin', type=float, help='Min value to plot.')
 parser.add_argument('--vmax', type=float, help='Max value to plot.')
+parser.add_argument('-p', '--pol', type=int, default=0, choices=range(4), help='Polarization component to visualize, 0 for I/T, 1 for Q, 2 for U, 3 for V.')
 parser.add_argument('--log', action='store_true', help='Whether plot log scale.')
 parser.add_argument('-l', '--figlength', type=float, default=8, help='Output figure length.')
 parser.add_argument('-w', '--figwidth', type=float, default=6, help='Output figure width.')
@@ -72,11 +76,3 @@ parser.set_defaults(func=plot_alm)
 
 args = parser.parse_args()
 args.func(args)
-
-
-
-
-
-
-
-

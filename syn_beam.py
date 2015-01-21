@@ -12,10 +12,12 @@ import argparse
 import numpy as np
 import healpy
 import h5py
+from mpi4py import MPI
 
 from drift.telescope import cylinder
 from drift.telescope import exotic_cylinder
 from drift.core import visibility
+from drift.util import mpiutil
 from cora.util import hputil
 
 
@@ -97,17 +99,22 @@ horizon = cyl._horizon
 wavelength = cyl.wavelengths[1] # central wavelength, corresponding to args.freq
 
 Nbl = len(cyl.baselines) # number of baselines
-enus = 0.0
-for (n, bi) in zip(cyl.redundancy, range(Nbl)):
+enu = 0.0
+# for (n, bi) in zip(cyl.redundancy, range(Nbl)):
+for bi in mpiutil.mpirange(Nbl):
+    n = cyl.redundancy[bi]
     if args.primary_beam:
-        enus += n * np.array(cyl._beam_map_single(bi, (cyl.num_freq - 1)/2))
+        enu += n * np.array(cyl._beam_map_single(bi, (cyl.num_freq - 1)/2))
     else:
         uv = cyl.baselines[bi] / wavelength
         fringe = visibility.fringe(angpos, cyl.zenith, uv)
         if args.mask_horizon:
-            enus += n * fringe * horizon
+            enu += n * fringe * horizon
         else:
-            enus += n * fringe
+            enu += n * fringe
+
+enus = np.zeros_like(enu)
+MPI.COMM_WORLD.Reduce(enu, enus, op=MPI.SUM, root=0)
 
 if args.outfile is not None:
     outenus = 'enus_' + args.outfile
@@ -121,15 +128,16 @@ else:
         outpalms = 'palms_%d_%.1f_%.1f_%.1f_%s_case%d_%s.hdf5' % (args.nside, args.freq, args.lat, args.lon, args.auto_corr, args.case, args.mask_horizon)
 
 # save enus (synthesized beam?)
-with h5py.File(outenus, 'w') as f:
-    f.create_dataset('map', data=enus)
+if mpiutil.rank0:
+    with h5py.File(outenus, 'w') as f:
+        f.create_dataset('map', data=enus)
 
-# spherical harmonic transform
-if args.primary_beam:
-    alm = hputil.sphtrans_complex_pol([enus[0], enus[1], enus[2], enus[3]], centered=True)
-else:
-    alm = hputil.sphtrans_complex(enus, centered=True)
+    # spherical harmonic transform
+    if args.primary_beam:
+        alm = hputil.sphtrans_complex_pol([enus[0], enus[1], enus[2], enus[3]], centered=True)
+    else:
+        alm = hputil.sphtrans_complex(enus, centered=True)
 
-# save data
-with h5py.File(outpalms, 'w') as f:
-    f.create_dataset('alm', data=np.array(alm))
+    # save data
+    with h5py.File(outpalms, 'w') as f:
+        f.create_dataset('alm', data=np.array(alm))

@@ -22,9 +22,15 @@ def cart_proj(args):
     matplotlib.use('Agg')
     # from matplotlib import pyplot as plt
 
-    with h5py.File(args.inmap, 'r') as f:
-        hpmap = f['map'][...]
-    # cent_latlon = (args.clat, args.clon) # latitude, longitude of the center point
+    # Read in maps data
+    hpmap = None
+    for mapname in args.mapfiles:
+        with h5py.File(mapname, 'r') as f:
+            if hpmap == None:
+                hpmap = f['map'][:]
+            else:
+                hpmap += f['map'][:]
+
     lat_range = [args.clat - args.lat_ext, args.clat + args.lat_ext]
     lon_range = [args.clon - args.lon_ext, args.clon + args.lon_ext]
     cart_map = healpy.cartview(hpmap[args.ifreq, args.pol], latra=lat_range, lonra=lon_range, return_projected_map=True) # only T map
@@ -39,7 +45,7 @@ def cart_proj(args):
 
 
 parser = argparse.ArgumentParser(description='Cartesian projection to get a square part of a full sky map.')
-parser.add_argument('inmap', type=str, help='Input healpix map.')
+parser.add_argument('mapfiles', type=str, nargs='+', help='Input hdf5 sky map files to visualize. If more than one, they will be first combined, i.e. added together.')
 parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file to save into. If not present, the output image file name will be auto created from the input args.')
 parser.add_argument('--clat', type=float, nargs='?', default=-30, help='Central point latitude of the projected map.')
 parser.add_argument('--clon', type=float, nargs='?', default=-90, help='Central point longitude of the projected map.')

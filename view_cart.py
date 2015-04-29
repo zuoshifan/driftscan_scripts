@@ -38,7 +38,8 @@ def visualize_cart(args):
     plt.xlabel('RA / deg')
     plt.ylabel('DEC / deg')
     cbar = plt.colorbar()
-    cbar.solids.set_rasterized(True) # eliminate lines in colorbar for PDF output, see http://matplotlib.1069221.n5.nabble.com/rasterized-colorbar-td39582.html
+    if args.figfmt == 'pdf':
+        cbar.solids.set_rasterized(True) # eliminate lines in colorbar for PDF output, see http://matplotlib.1069221.n5.nabble.com/rasterized-colorbar-td39582.html
     ## can not completely eliminate lines in colorbar, see http://matplotlib.org/api/pyplot_api.html?highlight=colorbar#matplotlib.pyplot.colorbar
     # cbar.solids.set_edgecolor("face")
     # plt.draw()
@@ -49,7 +50,7 @@ def visualize_cart(args):
 parser = argparse.ArgumentParser(description='Visualize a cartesian sky map.')
 parser.add_argument('inmap', type=str, help='Input cartesian map.')
 parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file to save into. If not present, the output image file name will be auto created from the input args.')
-parser.add_argument('--figfmt', default='pdf', help='Output image format.')
+parser.add_argument('--figfmt', default='png', help='Output image format.')
 parser.add_argument('--vmin', type=float, help='The min value of the visualize range in the output image.')
 parser.add_argument('--vmax', type=float, help='The max value of the visualize range in the output image.')
 parser.add_argument('-l', '--figlength', type=float, default=8, help='Output figure length.')

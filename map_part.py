@@ -18,6 +18,7 @@ def cart_proj(args):
     import numpy as np
     import healpy
     import h5py
+    import rotate as rot
     import matplotlib
     matplotlib.use('Agg')
     # from matplotlib import pyplot as plt
@@ -33,7 +34,17 @@ def cart_proj(args):
 
     lat_range = [args.clat - args.lat_ext, args.clat + args.lat_ext]
     lon_range = [args.clon - args.lon_ext, args.clon + args.lon_ext]
-    cart_map = healpy.cartview(hpmap[args.ifreq, args.pol], latra=lat_range, lonra=lon_range, return_projected_map=True) # only T map
+    # first rotate the map to let the point [clat, clon] be at the center
+    # must rotate clon and clat separately, and NOTE the negative sign
+    hpmap = rot.rotate_map(hpmap, rot=(-args.clon, 0.0, 0.0))
+    hpmap = rot.rotate_map(hpmap, rot=(0.0, -args.clat, 0.0))
+
+    # lat, lon value after rotation
+    rot_lat_range = [lat_range[0] - args.clat, lat_range[1] - args.clat]
+    rot_lon_range = [lon_range[0] - args.clon, lon_range[1] - args.clon]
+
+    # cartesian projection
+    cart_map = healpy.cartview(hpmap[args.ifreq, args.pol], latra=rot_lat_range, lonra=rot_lon_range, return_projected_map=True) # only T map
 
     out_file = args.outfile or 'cart_%.1f_%.1f_%.1f_%.1f.hdf5' % (lat_range[0], lat_range[1], lon_range[0], lon_range[1])
     with h5py.File(out_file, 'w') as f:

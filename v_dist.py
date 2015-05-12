@@ -143,7 +143,7 @@ cyl3_fp = []
 
 
 # Read in arguments
-parser = argparse.ArgumentParser(description="compute the synthesized beam of an cylinder array and its spherical harmonic coefficients.")
+parser = argparse.ArgumentParser(description="Calculate v baselines distribution.")
 parser.add_argument('-c', '--case', type=int, choices=range(1, Nconf+1), default=1, help='Which array configuration.')
 parser.add_argument('-a', '--auto_corr', action='store_false', help='Whether use auto correlation.')
 parser.add_argument('-f', '--freq', type=float, default=750.0, help='Observing frequency.')
@@ -186,9 +186,9 @@ elif args.case == 4:
     Nfeeds1 = 31
     Nfeeds2 = 32
     Nfeeds3 = 33
-    D1 = Nfeeds1 * 0.4 / (Nfeeds1 - 1) # m
+    D1 = (Nfeeds2 - 1) * 0.4 / (Nfeeds1 - 1) # m
     D2 = 0.4 # m
-    D3 = Nfeeds3 * 0.4 / (Nfeeds3 - 1) # m
+    D3 = (Nfeeds2 - 1) * 0.4 / (Nfeeds3 - 1) # m
     Dl1 = D1 / wavelen
     Dl2 = D2 / wavelen
     Dl3 = D3 / wavelen
@@ -232,7 +232,7 @@ if args.auto_corr:
 else:
     v = [abs(cyls_fp[i] - cyls_fp[j]) for i in range(Nf) for j in range(i + 1, Nf)]
 v = np.array(v)
-v = np.around(v, 5)
+v = np.around(v, 8)
 v_uniq, v_cnt = unique(v, return_counts=True)
 
 if args.outfile is not None:

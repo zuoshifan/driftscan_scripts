@@ -21,7 +21,7 @@ from matplotlib.ticker import MultipleLocator
 
 # Read in arguments
 parser = argparse.ArgumentParser(description="Calculate v baselines distribution.")
-parser.add_argument('-c', '--case', type=int, choices=range(1, 6), default=1, help='Which array configuration.')
+parser.add_argument('-c', '--case', type=int, choices=range(1, 7), default=1, help='Which array configuration.')
 parser.add_argument('-a', '--auto_corr', action='store_false', help='Whether use auto correlation.')
 parser.add_argument('-f', '--figfmt', default='png', help='Output image format.')
 parser.add_argument('-l', '--figlength', type=float, default=8, help='Output figure length.')
@@ -32,7 +32,7 @@ args = parser.parse_args()
 
 
 
-conf = ['3x32_0.5', '3x32_1.0', '3x32_2.5', '31_32_33_1.0', '31_32_33_2.5']
+conf = ['3x32_0.5', '3x32_1.0', '3x32_2.5', '31_32_33_1.0', '31_32_33_2.5', 'random_1.0']
 Nconf = len(conf)
 cyl1_fp = [] # feed v position for feed 1, unit: lambda
 cyl2_fp = []
@@ -47,7 +47,7 @@ if args.case == 1:
         cyl2_fp.append(fd * v)
         cyl3_fp.append(fd * v)
 # Case 2: 3x32 v = 1.0
-if args.case == 2:
+elif args.case == 2:
     Nfeeds = 32
     v = 1.0 # in unit of one wavelength
     for fd in range(Nfeeds):
@@ -55,7 +55,7 @@ if args.case == 2:
         cyl2_fp.append(fd * v)
         cyl3_fp.append(fd * v)
 # Case 3: 3x32 v = 2.5
-if args.case == 3:
+elif args.case == 3:
     Nfeeds = 32
     v = 2.5 # in unit of one wavelength
     for fd in range(Nfeeds):
@@ -90,6 +90,15 @@ elif args.case == 5:
         cyl2_fp.append(fd2 * v2)
     for fd3 in range(Nfeeds3):
         cyl3_fp.append(fd3 * v3)
+# Case 6: random v = 1.0
+elif args.case == 6:
+    Nfeeds = 32
+    v = 1.0 # in unit of one wavelength
+    for fd in range(Nfeeds):
+        cyl1_fp.append(fd * v + np.random.uniform(-0.5, 0.5))
+        cyl2_fp.append(fd * v + np.random.uniform(-0.5, 0.5))
+        cyl3_fp.append(fd * v + np.random.uniform(-0.5, 0.5))
+
 
 
 cyls_fp = cyl1_fp + cyl2_fp + cyl3_fp # all feed v positions

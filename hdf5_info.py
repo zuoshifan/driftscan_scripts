@@ -14,6 +14,10 @@ import argparse
 def h5_info(args):
     """View informations of a hdf5 data file.
     """
+    try:
+        import cPickle as pickle
+    except:
+        import pickle
     import h5py
 
     def print_info(name, obj):
@@ -24,6 +28,10 @@ def h5_info(args):
             print name
         # print group/dataset attributes
         for name, value in obj.attrs.iteritems():
+            try:
+                value = pickle.loads(value) # unpickle pickled data
+            except:
+                pass
 	    print name + ":", value
 
     for h5file in args.h5files:
@@ -31,6 +39,10 @@ def h5_info(args):
         with h5py.File(h5file, 'r') as f:
             # print file attributes
             for name, value in f.attrs.iteritems():
+                try:
+                    value = pickle.loads(value) # unpickle pickled data
+                except:
+                    pass
                 print name + ':', value
             f.visititems(print_info)
         print '-' * 60
@@ -41,3 +53,5 @@ parser.set_defaults(func=h5_info)
 
 args = parser.parse_args()
 args.func(args)
+
+

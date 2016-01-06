@@ -27,23 +27,23 @@ def h5_info(args):
         except:
             print name
         # print group/dataset attributes
-        for name, value in obj.attrs.iteritems():
+        for attrs_name, attrs_value in obj.attrs.iteritems():
             try:
-                value = pickle.loads(value) # unpickle pickled data
+                attrs_value = pickle.loads(attrs_value) # unpickle pickled data
             except:
                 pass
-	    print name + ":", value
+            print '%s.attrs["%s"]:' % (name, attrs_name), attrs_value
 
     for h5file in args.h5files:
         print 'File: ', h5file
         with h5py.File(h5file, 'r') as f:
             # print file attributes
-            for name, value in f.attrs.iteritems():
+            for attrs_name, attrs_value in f.attrs.iteritems():
                 try:
-                    value = pickle.loads(value) # unpickle pickled data
+                    attrs_value = pickle.loads(attrs_value) # unpickle pickled data
                 except:
                     pass
-                print name + ':', value
+                print '/.attrs["%s"]:' % (attrs_name), attrs_value
             f.visititems(print_info)
         print '-' * 60
 

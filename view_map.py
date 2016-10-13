@@ -56,10 +56,13 @@ def visualize_map(args):
 
     # Plot and save image
     fig = plt.figure(1, figsize=(args.figlength,args.figwidth))
+    map_data = hpmap[ifreq][args.pol]
+    if args.sqrt:
+        map_data = map_data / np.sqrt(np.abs(map_data))
     if args.view == 'm':
-        hpvisual.mollview(hpmap[ifreq][args.pol], fig=1, title='', min=args.min, max=args.max)
+        hpvisual.mollview(map_data, fig=1, title='', min=args.min, max=args.max)
     elif args.view == 'c':
-        healpy.cartview(hpmap[ifreq][args.pol], fig=1, title='', min=args.min, max=args.max)
+        healpy.cartview(map_data, fig=1, title='', min=args.min, max=args.max)
     # fig = plt.figure()
     # ax = fig.add_axes()
     # cbar.solids.set_rasterized(True)
@@ -77,6 +80,7 @@ parser.add_argument('mapfiles', type=str, nargs='+', help='Input hdf5 sky map fi
 parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the image file to save into. If not present, the output image file name will be auto created from the first input map file name and input args.')
 parser.add_argument('-f', '--figfmt', default='png', help='Output image format.')
 parser.add_argument('-v', '--view', type=str, choices=['m', 'c'], default='m', help='Which view, `m` for mollview, `c` for cartview.')
+parser.add_argument('-s', '--sqrt', action='store_true', help='Plot by sqrt of the map.')
 parser.add_argument('-i', '--ifreq', type=int, default=0, help='Frequency channel to visualize (start from 0). Negative integer N means the last Nth channel.')
 parser.add_argument('-p', '--pol', type=int, default=0, choices=range(4), help='Polarization component to visualize, 0 for I/T, 1 for Q, 2 for U, 3 for V.')
 parser.add_argument('--min', type=float, help='The min value of the visualize range in the output image.')

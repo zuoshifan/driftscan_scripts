@@ -59,15 +59,36 @@ def visualize_map(args):
         fig = plt.figure(1, figsize=(8, 6))
     else:
         fig = plt.figure(1, figsize=(args.figlength,args.figwidth))
+
     map_data = hpmap[ifreq][args.pol]
     if args.sqrt:
         map_data = map_data / np.sqrt(np.abs(map_data))
         map_data = map_data / np.sqrt(np.abs(map_data))
         # map_data = map_data / np.sqrt(np.abs(map_data))
-        # import rotate
-        # map_data = rotate.rotate_map(map_data, rot=(0, -90, 0)) # rotate to make NCP at center
+
+    # smoothing the map with a Gaussian symmetric beam
+    if args.fwhm is not None:
+        fwhm = np.radians(args.fwhm)
+        map_data = healpy.smoothing(map_data, fwhm=fwhm)
+
     if args.view == 'm':
-        hpvisual.mollview(map_data, fig=1, title='', min=args.min, max=args.max)
+        # set color map
+        if args.cmap is None:
+            cmap = None
+        else:
+            if args.cmap == 'jet09':
+                import colormap
+                cmap = colormap.jet09
+            else:
+                from pylab import cm
+                # cmap = cm.hot
+                cmap = getattr(cm, args.cmap)
+            cmap.set_under('w')
+
+        if args.abs:
+            healpy.mollview(np.abs(map_data), fig=1, title='', cmap=cmap, min=args.min, max=args.max)
+        else:
+            healpy.mollview(map_data, fig=1, title='', cmap=cmap, min=args.min, max=args.max)
     elif args.view == 'c':
         healpy.cartview(map_data, fig=1, title='', min=args.min, max=args.max)
     elif args.view == 'o':
@@ -90,6 +111,9 @@ parser.add_argument('-o', '--outfile', type=str, nargs='?', help='Name of the im
 parser.add_argument('-f', '--figfmt', default='png', help='Output image format.')
 parser.add_argument('-v', '--view', type=str, choices=['m', 'c', 'o'], default='m', help='Which view, `m` for mollview, `c` for cartview, `o` for orthview.')
 parser.add_argument('-s', '--sqrt', action='store_true', help='Plot by sqrt of the map.')
+parser.add_argument('--fwhm', type=float, default=None, help='Smoothing the map with a Gaussian symmetric beam with FWHM this value, in degree.')
+parser.add_argument('-a', '--abs', action='store_true', help='Plot the abs value of the map.')
+parser.add_argument('-c', '--cmap', type=str, default=None, help='The cmap to use.')
 parser.add_argument('-i', '--ifreq', type=int, default=0, help='Frequency channel to visualize (start from 0). Negative integer N means the last Nth channel.')
 parser.add_argument('-p', '--pol', type=int, default=0, choices=range(4), help='Polarization component to visualize, 0 for I/T, 1 for Q, 2 for U, 3 for V.')
 parser.add_argument('--min', type=float, help='The min value of the visualize range in the output image.')

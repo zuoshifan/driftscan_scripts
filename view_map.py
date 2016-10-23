@@ -89,6 +89,26 @@ def visualize_map(args):
             healpy.mollview(np.abs(map_data), fig=1, title='', cmap=cmap, min=args.min, max=args.max)
         else:
             healpy.mollview(map_data, fig=1, title='', cmap=cmap, min=args.min, max=args.max)
+
+        # plot NVSS sources
+        if args.nvss is not None:
+            import aipy as a
+
+            flux = args.nvss
+            frequency = 750 # MHz
+            catalog = 'nvss'
+            # catalog = 'wenss'
+            src = '%f/%f' % (flux, frequency / 1.0e3)
+            srclist, cutoff, catalogs = a.scripting.parse_srcs(src, catalog)
+            cat = a.src.get_catalog(srclist, cutoff, catalogs)
+            nsrc = len(cat) # number of sources in cat
+            ras = [ np.degrees(cat.values()[i]._ra) for i in range(nsrc) ]
+            decs = [ np.degrees(cat.values()[i]._dec) for i in range(nsrc) ]
+            jys = [ cat.values()[i].get_jys() for i in range(nsrc) ]
+
+            # healpy.projscatter(ras, decs, lonlat=True, s=jys, facecolors='none', edgecolors='w', alpha=1.0, linewidth=1.0)
+            healpy.projscatter(ras, decs, lonlat=True, s=150, facecolors='none', edgecolors='w', alpha=1.0, linewidth=1.0)
+
     elif args.view == 'c':
         healpy.cartview(map_data, fig=1, title='', min=args.min, max=args.max)
     elif args.view == 'o':
@@ -113,6 +133,7 @@ parser.add_argument('-v', '--view', type=str, choices=['m', 'c', 'o'], default='
 parser.add_argument('-s', '--sqrt', action='store_true', help='Plot by sqrt of the map.')
 parser.add_argument('--fwhm', type=float, default=None, help='Smoothing the map with a Gaussian symmetric beam with FWHM this value, in degree.')
 parser.add_argument('-a', '--abs', action='store_true', help='Plot the abs value of the map.')
+parser.add_argument('-n', '--nvss', type=float, default=None, help='Plot NVSS sources above this value, in Jy.')
 parser.add_argument('-c', '--cmap', type=str, default=None, help='The cmap to use.')
 parser.add_argument('-i', '--ifreq', type=int, default=0, help='Frequency channel to visualize (start from 0). Negative integer N means the last Nth channel.')
 parser.add_argument('-p', '--pol', type=int, default=0, choices=range(4), help='Polarization component to visualize, 0 for I/T, 1 for Q, 2 for U, 3 for V.')

@@ -22,7 +22,7 @@ def visualize_map(args):
     import numpy as np
     import h5py
     import healpy
-    import hpvisual
+    # import hpvisual
     import matplotlib
     matplotlib.use('Agg')
     from matplotlib import pyplot as plt
@@ -106,13 +106,19 @@ def visualize_map(args):
             decs = [ np.degrees(cat.values()[i]._dec) for i in range(nsrc) ]
             jys = [ cat.values()[i].get_jys() for i in range(nsrc) ]
 
+            # select sources
+            inds = np.where(np.array(decs)>-15.0)[0]
+            ras = np.array(ras)[inds]
+            decs = np.array(decs)[inds]
+            jys = np.array(jys)[inds]
+
             # healpy.projscatter(ras, decs, lonlat=True, s=jys, facecolors='none', edgecolors='w', alpha=1.0, linewidth=1.0)
             healpy.projscatter(ras, decs, lonlat=True, s=150, facecolors='none', edgecolors='w', alpha=1.0, linewidth=1.0)
 
     elif args.view == 'c':
         healpy.cartview(map_data, fig=1, title='', min=args.min, max=args.max)
     elif args.view == 'o':
-        hpvisual.orthview(map_data, rot=(0, 90, 0), fig=1, title='', min=args.min, max=args.max, half_sky=True) # rot to make NCP at the center
+        healpy.orthview(map_data, rot=(0, 90, 0), fig=1, title='', min=args.min, max=args.max, half_sky=True) # rot to make NCP at the center
     # fig = plt.figure()
     # ax = fig.add_axes()
     # cbar.solids.set_rasterized(True)

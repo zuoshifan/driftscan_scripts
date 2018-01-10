@@ -40,6 +40,9 @@ def visualize_cart(args):
     # ext = (lon_max + 360, lon_min + 360, lat_min, lat_max)
     ext = (lon_max, lon_min, lat_min, lat_max)
     plt.imshow(cart_map, extent=ext, origin='lower', vmin=args.vmin, vmax=args.vmax)
+    # cart_map = cart_map[:, 315-15:315+15]
+    # plt.imshow(cart_map, extent=ext, aspect='auto', origin='lower', vmin=args.vmin, vmax=args.vmax)
+    # plt.imshow(cart_map, origin='lower', vmin=args.vmin, vmax=args.vmax)
     plt.xlabel('RA / deg')
     plt.ylabel('DEC / deg')
     cbar = plt.colorbar()

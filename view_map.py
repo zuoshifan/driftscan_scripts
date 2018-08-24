@@ -31,7 +31,7 @@ def visualize_map(args):
     hpmap = None
     for mapname in args.mapfiles:
         with h5py.File(mapname, 'r') as f:
-            if hpmap == None:
+            if hpmap is None:
                 hpmap = f['map'][:]
             else:
                 hpmap += f['map'][:]
@@ -86,9 +86,9 @@ def visualize_map(args):
             cmap.set_under('w')
 
         if args.abs:
-            healpy.mollview(np.abs(map_data), fig=1, title='', cmap=cmap, min=args.min, max=args.max)
+            healpy.mollview(np.abs(map_data), fig=1, title='', unit=args.unit, cmap=cmap, min=args.min, max=args.max)
         else:
-            healpy.mollview(map_data, fig=1, title='', cmap=cmap, min=args.min, max=args.max)
+            healpy.mollview(map_data, fig=1, title='', unit=args.unit, cmap=cmap, min=args.min, max=args.max)
 
         # plot NVSS sources
         if args.nvss is not None:
@@ -116,9 +116,9 @@ def visualize_map(args):
             healpy.projscatter(ras, decs, lonlat=True, s=150, facecolors='none', edgecolors='w', alpha=1.0, linewidth=1.0)
 
     elif args.view == 'c':
-        healpy.cartview(map_data, fig=1, title='', min=args.min, max=args.max)
+        healpy.cartview(map_data, fig=1, title='', unit=args.unit, min=args.min, max=args.max)
     elif args.view == 'o':
-        healpy.orthview(map_data, rot=(0, 90, 0), fig=1, title='', min=args.min, max=args.max, half_sky=True) # rot to make NCP at the center
+        healpy.orthview(map_data, rot=(0, 90, 0), fig=1, title='', unit=args.unit, min=args.min, max=args.max, half_sky=True) # rot to make NCP at the center
     # fig = plt.figure()
     # ax = fig.add_axes()
     # cbar.solids.set_rasterized(True)
@@ -145,6 +145,7 @@ parser.add_argument('-i', '--ifreq', type=int, default=0, help='Frequency channe
 parser.add_argument('-p', '--pol', type=int, default=0, choices=range(4), help='Polarization component to visualize, 0 for I/T, 1 for Q, 2 for U, 3 for V.')
 parser.add_argument('--min', type=float, help='The min value of the visualize range in the output image.')
 parser.add_argument('--max', type=float, help='The max value of the visualize range in the output image.')
+parser.add_argument('-u', '--unit', type=str, default='', help='A text describing the unit of the data.')
 parser.add_argument('-l', '--figlength', type=float, default=13, help='Output figure length.')
 parser.add_argument('-w', '--figwidth', type=float, default=5, help='Output figure width.')
 parser.add_argument('-g', '--grid', action='store_false', help='Add meridians and parallels.')

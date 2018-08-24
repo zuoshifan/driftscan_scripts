@@ -25,6 +25,12 @@ def visualize_map(args):
     # import hpvisual
     import matplotlib
     matplotlib.use('Agg')
+    try:
+        # for new version matplotlib
+        import matplotlib.style as mstyle
+        mstyle.use('classic')
+    except ImportError:
+        pass
     from matplotlib import pyplot as plt
 
     # Read in maps data
